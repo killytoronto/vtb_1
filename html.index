@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillChain</title>
+    <!-- Подключение Tailwind CSS через CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключение Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Подключение Mermaid для диаграмм -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    <style>
+        /* Дополнительные стили для анимаций и улучшений UI */
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse-button:hover {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-r from-blue-100 to-indigo-200 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white p-6 shadow-lg">
+        <h1 class="text-4xl font-bold text-center">SkillChain</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto p-6">
+        <!-- Введение с диаграммой -->
+        <section id="introduction" class="mb-12 fade-in">
+            <h2 class="text-3xl font-semibold mb-4 text-center">Добро пожаловать в SkillChain</h2>
+            <p class="text-center mb-6">Платформа для создания и управления цифровыми профилями сотрудников на основе Verifiable Credentials и NFT.</p>
+            <div class="flex justify-center">
+                <div class="mermaid">
+                    graph TD
+                        A[Пользователь] --> B[Фронтенд]
+                        B --> C[LocalStorage]
+                        B --> D[MetaMask]
+                        B --> E[Смарт-контракт NFT]
+                        E --> F[Блокчейн]
+                </div>
+            </div>
+        </section>
+
+        <!-- Профиль -->
+        <section id="profile" class="mb-12 fade-in">
+            <h2 class="text-2xl font-bold mb-4">Профиль сотрудника</h2>
+            <form id="profile-form" class="space-y-4 max-w-md mx-auto">
+                <div>
+                    <label class="block text-lg font-medium">Имя:</label>
+                    <input type="text" id="name" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <div>
+                    <label class="block text-lg font-medium">Должность:</label>
+                    <input type="text" id="position" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                </div>
+                <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg shadow hover:bg-blue-600 transition duration-300">Сохранить <i class="fa fa-save ml-2"></i></button>
+            </form>
+            <div id="profile-display" class="mt-6 hidden max-w-md mx-auto text-center">
+                <p class="text-xl"><strong>Имя:</strong> <span id="display-name"></span></p>
+                <p class="text-xl"><strong>Должность:</strong> <span id="display-position"></span></p>
+                <button id="edit-profile" class="mt-4 bg-yellow-500 text-white py-2 px-4 rounded-lg shadow hover:bg-yellow-600 transition duration-300">Редактировать <i class="fa fa-edit ml-2"></i></button>
+            </div>
+        </section>
+
+        <!-- Сертификаты -->
+        <section id="certificates" class="mb-12 fade-in">
+            <h2 class="text-2xl font-bold mb-4">Сертификаты и Награды</h2>
+            <form id="certificate-form" class="space-y-4 max-w-lg mx-auto">
+                <div>
+                    <label class="block text-lg font-medium">Название сертификата:</label>
+                    <input type="text" id="certificate-name" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500" required>
+                </div>
+                <div>
+                    <label class="block text-lg font-medium">Описание:</label>
+                    <textarea id="certificate-description" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="w-full bg-green-500 text-white py-3 rounded-lg shadow hover:bg-green-600 transition duration-300">Добавить сертификат <i class="fa fa-plus ml-2"></i></button>
+            </form>
+            <div id="certificates-list" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- Навыки -->
+        <section id="skills" class="mb-12 fade-in">
+            <h2 class="text-2xl font-bold mb-4">Навыки и Достижения</h2>
+            <form id="skill-form" class="space-y-4 max-w-lg mx-auto">
+                <div>
+                    <label class="block text-lg font-medium">Навык:</label>
+                    <input type="text" id="skill-name" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+                </div>
+                <div>
+                    <label class="block text-lg font-medium">Уровень:</label>
+                    <select id="skill-level" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500" required>
+                        <option value="" disabled selected>Выберите уровень</option>
+                        <option value="Начальный">Начальный</option>
+                        <option value="Средний">Средний</option>
+                        <option value="Продвинутый">Продвинутый</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-purple-500 text-white py-3 rounded-lg shadow hover:bg-purple-600 transition duration-300">Добавить навык <i class="fa fa-plus ml-2"></i></button>
+            </form>
+            <div id="skills-list" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- Рекомендации -->
+        <section id="recommendations" class="mb-12 fade-in">
+            <h2 class="text-2xl font-bold mb-4">Рекомендации</h2>
+            <form id="recommendation-form" class="space-y-4 max-w-lg mx-auto">
+                <div>
+                    <label class="block text-lg font-medium">Имя рекомендателя:</label>
+                    <input type="text" id="recommender-name" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                </div>
+                <div>
+                    <label class="block text-lg font-medium">Текст рекомендации:</label>
+                    <textarea id="recommendation-text" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="w-full bg-indigo-500 text-white py-3 rounded-lg shadow hover:bg-indigo-600 transition duration-300">Добавить рекомендацию <i class="fa fa-plus ml-2"></i></button>
+            </form>
+            <div id="recommendations-list" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- Верификация и MetaMask -->
+        <section id="verification" class="mb-12 fade-in">
+            <h2 class="text-2xl font-bold mb-4">Верификация и NFT</h2>
+            <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                <button id="verify-button" class="flex items-center bg-red-500 text-white py-3 px-6 rounded-lg shadow hover:bg-red-600 transition duration-300 pulse-button">
+                    Верифицировать сертификаты <i class="fa fa-check ml-2"></i>
+                </button>
+                <button id="connect-metamask" class="flex items-center bg-orange-500 text-white py-3 px-6 rounded-lg shadow hover:bg-orange-600 transition duration-300 pulse-button">
+                    Подключить MetaMask <i class="fa fa-wallet ml-2"></i>
+                </button>
+            </div>
+            <div id="wallet-address" class="mt-4 text-center text-lg font-medium"></div>
+        </section>
+
+        <!-- Баллы за геймификацию -->
+        <div id="points-display" class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center">
+            <i class="fa fa-star mr-2"></i> Баллы: <span id="points" class="ml-2">0</span>
+        </div>
+
+        <!-- Дополнительная диаграмма -->
+        <section id="functionalities" class="mb-12 fade-in">
+            <h2 class="text-2xl font-bold mb-4 text-center">Функциональные Возможности</h2>
+            <div class="flex justify-center">
+                <div class="mermaid">
+                    flowchart LR
+                        A[Создание профиля] --> B[Добавление сертификатов]
+                        B --> C[Верификация сертификатов]
+                        C --> D[Выпуск NFT]
+                        D --> E[Просмотр NFT]
+                        A --> F[Добавление навыков]
+                        F --> G[Система геймификации]
+                        A --> H[Добавление рекомендаций]
+                        H --> I[Отображение рекомендаций]
+                        C --> J[Интеграция с MetaMask]
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white p-6 text-center">
+        &copy; 2024 SkillChain. Все права защищены.
+    </footer>
+
+    <!-- Скрипт -->
+    <script>
+        // Инициализация данных из localStorage или установка пустых значений
+        const profile = JSON.parse(localStorage.getItem('profile')) || {};
+        const certificates = JSON.parse(localStorage.getItem('certificates')) || [];
+        const skills = JSON.parse(localStorage.getItem('skills')) || [];
+        const recommendations = JSON.parse(localStorage.getItem('recommendations')) || [];
+        let points = parseInt(localStorage.getItem('points')) || 0;
+
+        // Элементы DOM
+        const profileForm = document.getElementById('profile-form');
+        const profileDisplay = document.getElementById('profile-display');
+        const displayName = document.getElementById('display-name');
+        const displayPosition = document.getElementById('display-position');
+        const editProfileBtn = document.getElementById('edit-profile');
+
+        const certificateForm = document.getElementById('certificate-form');
+        const certificatesList = document.getElementById('certificates-list');
+
+        const skillForm = document.getElementById('skill-form');
+        const skillsList = document.getElementById('skills-list');
+
+        const recommendationForm = document.getElementById('recommendation-form');
+        const recommendationsList = document.getElementById('recommendations-list');
+
+        const verifyButton = document.getElementById('verify-button');
+        const connectMetaMaskBtn = document.getElementById('connect-metamask');
+        const walletAddressDisplay = document.getElementById('wallet-address');
+
+        const pointsDisplay = document.getElementById('points');
+        pointsDisplay.textContent = points;
+
+        // Функции для сохранения данных в localStorage
+        function saveProfile() {
+            localStorage.setItem('profile', JSON.stringify(profile));
+        }
+
+        function saveCertificates() {
+            localStorage.setItem('certificates', JSON.stringify(certificates));
+        }
+
+        function saveSkills() {
+            localStorage.setItem('skills', JSON.stringify(skills));
+        }
+
+        function saveRecommendations() {
+            localStorage.setItem('recommendations', JSON.stringify(recommendations));
+        }
+
+        function savePoints() {
+            localStorage.setItem('points', points);
+        }
+
+        // Функции для отображения данных
+        function renderProfile() {
+            if (profile.name && profile.position) {
+                displayName.textContent = profile.name;
+                displayPosition.textContent = profile.position;
+                profileDisplay.classList.remove('hidden');
+                profileForm.classList.add('hidden');
+            } else {
+                profileDisplay.classList.add('hidden');
+                profileForm.classList.remove('hidden');
+            }
+        }
+
+        function renderCertificates() {
+            certificatesList.innerHTML = '';
+            certificates.forEach(cert => {
+                const certDiv = document.createElement('div');
+                certDiv.classList.add('bg-white', 'p-6', 'rounded-lg', 'shadow-lg', 'transform', 'hover:scale-105', 'transition', 'duration-300', 'relative');
+                certDiv.innerHTML = `
+                    <h3 class="text-xl font-bold mb-2">${cert.name}</h3>
+                    <p class="mb-2">${cert.description}</p>
+                    <p class="text-sm text-gray-500">ID: ${cert.id}</p>
+                    ${cert.nft ? `<p class="text-sm text-gray-500">NFT ID: ${cert.nft}</p>` : ''}
+                    <button class="share-button absolute top-4 right-4 bg-blue-400 text-white p-2 rounded-full shadow hover:bg-blue-500 transition duration-300">
+                        <i class="fa fa-share"></i>
+                    </button>
+                `;
+                // Добавление обработчика для кнопки "Поделиться"
+                certDiv.querySelector('.share-button').addEventListener('click', () => {
+                    const shareText = `Я получил сертификат "${cert.name}" на платформе SkillChain!`;
+                    // Имитация шэринга (можно заменить на реальный API VK)
+                    alert(`Шэринг в VK:\n${shareText}`);
+                });
+                certificatesList.appendChild(certDiv);
+            });
+        }
+
+        function renderSkills() {
+            skillsList.innerHTML = '';
+            skills.forEach(skill => {
+                const skillDiv = document.createElement('div');
+                skillDiv.classList.add('bg-white', 'p-6', 'rounded-lg', 'shadow-lg', 'transform', 'hover:scale-105', 'transition', 'duration-300');
+                skillDiv.innerHTML = `
+                    <h3 class="text-xl font-bold mb-2">${skill.name}</h3>
+                    <p class="mb-2">Уровень: ${skill.level}</p>
+                `;
+                skillsList.appendChild(skillDiv);
+            });
+        }
+
+        function renderRecommendations() {
+            recommendationsList.innerHTML = '';
+            recommendations.forEach(rec => {
+                const recDiv = document.createElement('div');
+                recDiv.classList.add('bg-white', 'p-6', 'rounded-lg', 'shadow-lg', 'transform', 'hover:scale-105', 'transition', 'duration-300');
+                recDiv.innerHTML = `
+                    <p class="italic mb-2">"${rec.text}"</p>
+                    <p class="text-sm text-gray-500">- ${rec.name}</p>
+                `;
+                recommendationsList.appendChild(recDiv);
+            });
+        }
+
+        function updatePoints(amount) {
+            points += amount;
+            savePoints();
+            pointsDisplay.textContent = points;
+        }
+
+        // Обработчики форм
+        profileForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            profile.name = document.getElementById('name').value;
+            profile.position = document.getElementById('position').value;
+            saveProfile();
+            renderProfile();
+            profileForm.reset();
+        });
+
+        editProfileBtn.addEventListener('click', () => {
+            profileForm.classList.remove('hidden');
+            profileDisplay.classList.add('hidden');
+        });
+
+        certificateForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('certificate-name').value;
+            const description = document.getElementById('certificate-description').value;
+            const id = generateUniqueId();
+            certificates.push({ name, description, id });
+            saveCertificates();
+            renderCertificates();
+            certificateForm.reset();
+        });
+
+        skillForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('skill-name').value;
+            const level = document.getElementById('skill-level').value;
+            skills.push({ name, level });
+            saveSkills();
+            renderSkills();
+            skillForm.reset();
+            updatePoints(10); // Добавляем 10 баллов за навык
+        });
+
+        recommendationForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('recommender-name').value;
+            const text = document.getElementById('recommendation-text').value;
+            recommendations.push({ name, text });
+            saveRecommendations();
+            renderRecommendations();
+            recommendationForm.reset();
+        });
+
+        // Генерация уникального ID
+        function generateUniqueId() {
+            return 'cert-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+        }
+
+        // Инициализация отображения данных при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProfile();
+            renderCertificates();
+            renderSkills();
+            renderRecommendations();
+        });
+
+        // Имитация выпуска NFT и создание Verifiable Credentials
+        verifyButton.addEventListener('click', () => {
+            if (certificates.length === 0) {
+                alert('Нет сертификатов для верификации.');
+                return;
+            }
+
+            certificates.forEach(cert => {
+                if (!cert.nft) {
+                    cert.nft = generateUniqueId();
+                }
+            });
+            saveCertificates();
+            renderCertificates();
+            alert('Сертификаты верифицированы и NFT выпущены!');
+        });
+
+        // Интеграция с MetaMask
+        async function connectMetaMask() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+                    const account = accounts[0];
+                    walletAddressDisplay.innerHTML = `<i class="fa fa-check-circle text-green-400 mr-2"></i>Адрес кошелька: ${account}`;
+                } catch (error) {
+                    console.error('Ошибка подключения MetaMask:', error);
+                    walletAddressDisplay.innerHTML = `<i class="fa fa-exclamation-circle text-red-400 mr-2"></i>Ошибка подключения MetaMask.`;
+                }
+            } else {
+                alert('MetaMask не установлен! Пожалуйста, установите MetaMask для полной функциональности.');
+            }
+        }
+
+        connectMetaMaskBtn.addEventListener('click', connectMetaMask);
+    </script>
+</body>
+</html>
