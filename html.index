@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkillChain</title>
-    <!-- Подключение Tailwind CSS через CDN -->
+    <!-- Подключение Tailwind CSS через CDN для стилизации -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Подключение Font Awesome для иконок -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Подключение Chart.js для визуализации данных -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Подключение Mermaid для диаграмм -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
@@ -33,15 +35,78 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+
+        /* Темная тема */
+        .dark-mode {
+            background-color: #1a202c;
+            color: #a0aec0;
+        }
+
+        .dark-mode .bg-white {
+            background-color: #2d3748;
+        }
+
+        .dark-mode .bg-gray-100 {
+            background-color: #1a202c;
+        }
+
+        .dark-mode .text-white {
+            color: #a0aec0;
+        }
+
+        .dark-mode .border {
+            border-color: #4a5568;
+        }
+
+        /* Стили для модальных окон */
+        .modal {
+            display: none; /* Скрыто по умолчанию */
+            position: fixed; /* Остается на месте */
+            z-index: 50; /* Поверх остальных элементов */
+            left: 0;
+            top: 0;
+            width: 100%; /* Полная ширина */
+            height: 100%; /* Полная высота */
+            overflow: auto; /* Включить прокрутку при необходимости */
+            background-color: rgba(0,0,0,0.5); /* Черный с прозрачностью */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; /* 10% сверху и центрирование */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Ширина */
+            max-width: 600px;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
     </style>
 </head>
-<body class="bg-gradient-to-r from-blue-100 to-indigo-200 min-h-screen flex flex-col">
-    <!-- Header -->
-    <header class="bg-blue-600 text-white p-6 shadow-lg">
-        <h1 class="text-4xl font-bold text-center">SkillChain</h1>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Header с переключателем темы -->
+    <header class="bg-blue-600 text-white p-6 shadow-lg flex justify-between items-center">
+        <h1 class="text-4xl font-bold">SkillChain</h1>
+        <button id="theme-toggle" class="bg-blue-500 p-2 rounded-full hover:bg-blue-600 transition duration-300">
+            <i class="fa fa-moon"></i>
+        </button>
     </header>
 
-    <!-- Main Content -->
+    <!-- Основной контент -->
     <main class="flex-grow container mx-auto p-6">
         <!-- Введение с диаграммой -->
         <section id="introduction" class="mb-12 fade-in">
@@ -71,12 +136,18 @@
                     <label class="block text-lg font-medium">Должность:</label>
                     <input type="text" id="position" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                 </div>
-                <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg shadow hover:bg-blue-600 transition duration-300">Сохранить <i class="fa fa-save ml-2"></i></button>
+                <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg shadow hover:bg-blue-600 transition duration-300 flex justify-center items-center">
+                    <span>Сохранить</span>
+                    <i class="fa fa-save ml-2"></i>
+                </button>
             </form>
             <div id="profile-display" class="mt-6 hidden max-w-md mx-auto text-center">
                 <p class="text-xl"><strong>Имя:</strong> <span id="display-name"></span></p>
                 <p class="text-xl"><strong>Должность:</strong> <span id="display-position"></span></p>
-                <button id="edit-profile" class="mt-4 bg-yellow-500 text-white py-2 px-4 rounded-lg shadow hover:bg-yellow-600 transition duration-300">Редактировать <i class="fa fa-edit ml-2"></i></button>
+                <button id="edit-profile" class="mt-4 bg-yellow-500 text-white py-2 px-4 rounded-lg shadow hover:bg-yellow-600 transition duration-300 flex justify-center items-center">
+                    <span>Редактировать</span>
+                    <i class="fa fa-edit ml-2"></i>
+                </button>
             </div>
         </section>
 
@@ -92,7 +163,10 @@
                     <label class="block text-lg font-medium">Описание:</label>
                     <textarea id="certificate-description" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500" rows="3" required></textarea>
                 </div>
-                <button type="submit" class="w-full bg-green-500 text-white py-3 rounded-lg shadow hover:bg-green-600 transition duration-300">Добавить сертификат <i class="fa fa-plus ml-2"></i></button>
+                <button type="submit" class="w-full bg-green-500 text-white py-3 rounded-lg shadow hover:bg-green-600 transition duration-300 flex justify-center items-center">
+                    <span>Добавить сертификат</span>
+                    <i class="fa fa-plus ml-2"></i>
+                </button>
             </form>
             <div id="certificates-list" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
@@ -114,7 +188,10 @@
                         <option value="Продвинутый">Продвинутый</option>
                     </select>
                 </div>
-                <button type="submit" class="w-full bg-purple-500 text-white py-3 rounded-lg shadow hover:bg-purple-600 transition duration-300">Добавить навык <i class="fa fa-plus ml-2"></i></button>
+                <button type="submit" class="w-full bg-purple-500 text-white py-3 rounded-lg shadow hover:bg-purple-600 transition duration-300 flex justify-center items-center">
+                    <span>Добавить навык</span>
+                    <i class="fa fa-plus ml-2"></i>
+                </button>
             </form>
             <div id="skills-list" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
@@ -131,7 +208,10 @@
                     <label class="block text-lg font-medium">Текст рекомендации:</label>
                     <textarea id="recommendation-text" class="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="3" required></textarea>
                 </div>
-                <button type="submit" class="w-full bg-indigo-500 text-white py-3 rounded-lg shadow hover:bg-indigo-600 transition duration-300">Добавить рекомендацию <i class="fa fa-plus ml-2"></i></button>
+                <button type="submit" class="w-full bg-indigo-500 text-white py-3 rounded-lg shadow hover:bg-indigo-600 transition duration-300 flex justify-center items-center">
+                    <span>Добавить рекомендацию</span>
+                    <i class="fa fa-plus ml-2"></i>
+                </button>
             </form>
             <div id="recommendations-list" class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
@@ -141,21 +221,18 @@
             <h2 class="text-2xl font-bold mb-4">Верификация и NFT</h2>
             <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
                 <button id="verify-button" class="flex items-center bg-red-500 text-white py-3 px-6 rounded-lg shadow hover:bg-red-600 transition duration-300 pulse-button">
-                    Верифицировать сертификаты <i class="fa fa-check ml-2"></i>
+                    <span>Верифицировать сертификаты</span>
+                    <i class="fa fa-check ml-2"></i>
                 </button>
                 <button id="connect-metamask" class="flex items-center bg-orange-500 text-white py-3 px-6 rounded-lg shadow hover:bg-orange-600 transition duration-300 pulse-button">
-                    Подключить MetaMask <i class="fa fa-wallet ml-2"></i>
+                    <span>Подключить MetaMask</span>
+                    <i class="fa fa-wallet ml-2"></i>
                 </button>
             </div>
             <div id="wallet-address" class="mt-4 text-center text-lg font-medium"></div>
         </section>
 
-        <!-- Баллы за геймификацию -->
-        <div id="points-display" class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center">
-            <i class="fa fa-star mr-2"></i> Баллы: <span id="points" class="ml-2">0</span>
-        </div>
-
-        <!-- Дополнительная диаграмма -->
+        <!-- Диаграмма функциональных возможностей -->
         <section id="functionalities" class="mb-12 fade-in">
             <h2 class="text-2xl font-bold mb-4 text-center">Функциональные Возможности</h2>
             <div class="flex justify-center">
@@ -170,15 +247,40 @@
                         A --> H[Добавление рекомендаций]
                         H --> I[Отображение рекомендаций]
                         C --> J[Интеграция с MetaMask]
+                        G --> K[Награды и достижения]
+                        J --> L[Управление кошельком]
                 </div>
             </div>
         </section>
+
+        <!-- Диаграмма навыков -->
+        <section id="skills-chart" class="mb-12 fade-in">
+            <h2 class="text-2xl font-bold mb-4 text-center">Визуализация Навыков</h2>
+            <div class="flex justify-center">
+                <canvas id="skillsChart" width="400" height="200"></canvas>
+            </div>
+        </section>
+
+        <!-- Модальное окно для подробностей сертификата -->
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2 class="text-2xl font-bold mb-4">Подробности Сертификата</h2>
+                <p id="modal-content" class="mb-4"></p>
+                <button class="bg-blue-500 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-600 transition duration-300">Закрыть</button>
+            </div>
+        </div>
     </main>
 
     <!-- Footer -->
     <footer class="bg-gray-800 text-white p-6 text-center">
         &copy; 2024 SkillChain. Все права защищены.
     </footer>
+
+    <!-- Баллы за геймификацию -->
+    <div id="points-display" class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center">
+        <i class="fa fa-star mr-2"></i> Баллы: <span id="points" class="ml-2">0</span>
+    </div>
 
     <!-- Скрипт -->
     <script>
@@ -212,6 +314,14 @@
         const pointsDisplay = document.getElementById('points');
         pointsDisplay.textContent = points;
 
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+
+        // Модальное окно
+        const modal = document.getElementById('modal');
+        const closeModal = document.getElementsByClassName('close')[0];
+        const modalContent = document.getElementById('modal-content');
+
         // Функции для сохранения данных в localStorage
         function saveProfile() {
             localStorage.setItem('profile', JSON.stringify(profile));
@@ -223,6 +333,7 @@
 
         function saveSkills() {
             localStorage.setItem('skills', JSON.stringify(skills));
+            updateSkillsChart();
         }
 
         function saveRecommendations() {
@@ -256,8 +367,11 @@
                     <p class="mb-2">${cert.description}</p>
                     <p class="text-sm text-gray-500">ID: ${cert.id}</p>
                     ${cert.nft ? `<p class="text-sm text-gray-500">NFT ID: ${cert.nft}</p>` : ''}
-                    <button class="share-button absolute top-4 right-4 bg-blue-400 text-white p-2 rounded-full shadow hover:bg-blue-500 transition duration-300">
+                    <button class="share-button absolute top-4 right-4 bg-blue-400 text-white p-2 rounded-full shadow hover:bg-blue-500 transition duration-300" title="Поделиться">
                         <i class="fa fa-share"></i>
+                    </button>
+                    <button class="details-button absolute bottom-4 right-4 bg-green-400 text-white p-2 rounded-full shadow hover:bg-green-500 transition duration-300" title="Подробнее">
+                        <i class="fa fa-info"></i>
                     </button>
                 `;
                 // Добавление обработчика для кнопки "Поделиться"
@@ -265,6 +379,16 @@
                     const shareText = `Я получил сертификат "${cert.name}" на платформе SkillChain!`;
                     // Имитация шэринга (можно заменить на реальный API VK)
                     alert(`Шэринг в VK:\n${shareText}`);
+                });
+                // Добавление обработчика для кнопки "Подробнее"
+                certDiv.querySelector('.details-button').addEventListener('click', () => {
+                    modalContent.innerHTML = `
+                        <h3 class="text-xl font-bold mb-2">${cert.name}</h3>
+                        <p>${cert.description}</p>
+                        <p class="text-sm text-gray-500">ID: ${cert.id}</p>
+                        ${cert.nft ? `<p class="text-sm text-gray-500">NFT ID: ${cert.nft}</p>` : ''}
+                    `;
+                    modal.style.display = "block";
                 });
                 certificatesList.appendChild(certDiv);
             });
@@ -281,6 +405,7 @@
                 `;
                 skillsList.appendChild(skillDiv);
             });
+            updateSkillsChart();
         }
 
         function renderRecommendations() {
@@ -300,6 +425,51 @@
             points += amount;
             savePoints();
             pointsDisplay.textContent = points;
+        }
+
+        // Функции для визуализации навыков с помощью Chart.js
+        let skillsChart;
+        function updateSkillsChart() {
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            const labels = skills.map(skill => skill.name);
+            const data = skills.map(skill => {
+                switch(skill.level) {
+                    case 'Начальный': return 33;
+                    case 'Средний': return 66;
+                    case 'Продвинутый': return 100;
+                    default: return 0;
+                }
+            });
+
+            if (skillsChart) {
+                skillsChart.destroy();
+            }
+
+            skillsChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Уровень навыков',
+                        data: data,
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(99, 102, 241, 1)'
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // Обработчики форм
@@ -360,6 +530,7 @@
             renderCertificates();
             renderSkills();
             renderRecommendations();
+            updateSkillsChart();
         });
 
         // Имитация выпуска NFT и создание Verifiable Credentials
@@ -396,6 +567,28 @@
         }
 
         connectMetaMaskBtn.addEventListener('click', connectMetaMask);
+
+        // Переключатель темы
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            // Изменение иконки
+            if (body.classList.contains('dark-mode')) {
+                themeToggle.innerHTML = '<i class="fa fa-sun"></i>';
+            } else {
+                themeToggle.innerHTML = '<i class="fa fa-moon"></i>';
+            }
+        });
+
+        // Управление модальным окном
+        closeModal.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
     </script>
 </body>
 </html>
